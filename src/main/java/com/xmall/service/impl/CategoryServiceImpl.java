@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.xmall.common.ServerResponse;
 import com.xmall.dao.CategoryMapper;
+import com.xmall.dao.ProductMapper;
 import com.xmall.pojo.Category;
 import com.xmall.service.ICategoryService;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     /**
      * 添加品类
@@ -94,7 +98,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @return
      */
     @Override
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
+    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         Set<Category> categorySet = Sets.newHashSet();  // 使用guava对set进行初始化
         findChildCategory(categorySet, categoryId);
 
@@ -113,7 +117,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId
      * @return
      */
-    private Set<Category> findChildCategory(Set<Category> categorySet, Integer categoryId) {
+    public Set<Category> findChildCategory(Set<Category> categorySet, Integer categoryId) {
         Category category = categoryMapper.selectByPrimaryKey(categoryId);
         if (category != null) {
             categorySet.add(category);

@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 /**
- * Created by geely
+ * 读取配置文件的工具类
  */
 public class PropertiesUtil {
 
@@ -18,7 +18,7 @@ public class PropertiesUtil {
     private static Properties props;
 
     static {
-        String fileName = "mmall.properties";
+        String fileName = "xmall.properties";
         props = new Properties();
         try {
             props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(fileName),"UTF-8"));
@@ -37,7 +37,7 @@ public class PropertiesUtil {
 
     public static String getProperty(String key,String defaultValue){
 
-        String value = props.getProperty(key.trim());
+        String value = props.getProperty(key.trim());   // 防止配置文件键值对间出现空格，需trim一下
         if(StringUtils.isBlank(value)){
             value = defaultValue;
         }

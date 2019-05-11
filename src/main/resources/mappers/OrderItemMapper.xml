@@ -26,6 +26,7 @@
     from mmall_order_item
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_order_item
     where id = #{id,jdbcType=INTEGER}
@@ -163,4 +164,15 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+
+  <select id="selectByOrderNoUserId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_order_item
+    where order_no = #{orderNo}
+    and user_id = #{userId}
+  </select>
 </mapper>

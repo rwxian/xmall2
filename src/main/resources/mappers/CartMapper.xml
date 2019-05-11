@@ -21,10 +21,12 @@
     from mmall_cart
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_cart
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
   <insert id="insert" parameterType="com.xmall.pojo.Cart" >
     insert into mmall_cart (id, user_id, product_id, 
       quantity, checked, create_time, 
@@ -116,4 +118,59 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+
+  <select id="selectCartByUserIdProductId" resultType="com.xmall.pojo.Cart">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_cart
+    where user_id = #{userId}
+    and product_id = #{productId}
+  </select>
+
+  <select id="selectCartByUserId" parameterType="int" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_cart
+    where user_id = #{userId}
+  </select>
+  <select id="selectCartProductCheckedStatusByUserId" resultType="java.lang.Integer" parameterType="int">
+    select count(1) from mmall_cart where checked = 0 and user_id = #{userId}
+  </select>
+
+  <delete id="deleteByUserIdProductId" parameterType="map">
+    delete from mmall_cart
+    where user_id = #{userId}
+    <if test="productIdList != null">
+      and product_id in
+      <foreach collection="productIdList" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+  </delete>
+
+  <update id="checkedOrUncheckedProduct">
+    update mmall_cart
+    set checked = #{checked},
+    update_time = now()
+    where user_id = #{userId}
+    <if test="productId != null">
+      and product_id = #{productId}
+    </if>
+  </update>
+
+  <!--查看购物车商品购买件数，若sum(quantity) 是null,则赋该sum(quantity)=0，避免报空指针 -->
+  <select id="selectCartProductCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select IFNULL(sum(quantity), 0) as count from mmall_cart where user_id = #{userId}
+  </select>
+
+  <select id="selectCheckedCartByUserId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_cart
+    where user_id = #{userId};
+    and checked = 1
+  </select>
 </mapper>
