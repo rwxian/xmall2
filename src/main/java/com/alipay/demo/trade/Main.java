@@ -64,7 +64,7 @@ public class Main {
     }
 
     // 简单打印应答
-    private void dumpResponse(AlipayResponse response) {
+    /*private void dumpResponse(AlipayResponse response) {
         if (response != null) {
             log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
             if (StringUtils.isNotEmpty(response.getSubCode())) {
@@ -73,7 +73,7 @@ public class Main {
             }
             log.info("body:" + response.getBody());
         }
-    }
+    }*/
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -152,7 +152,7 @@ public class Main {
         ;
 
         MonitorHeartbeatSynResponse response = monitorService.heartbeatSyn(builder);
-        dumpResponse(response);
+        // dumpResponse(response);
     }
 
     // POS厂商的调用样例，填写了所有pos厂商需要填写的字段
@@ -191,7 +191,7 @@ public class Main {
         ;
 
         MonitorHeartbeatSynResponse response = monitorService.heartbeatSyn(builder);
-        dumpResponse(response);
+        // dumpResponse(response);
     }
 
     // 测试当面付2.0支付
@@ -297,7 +297,7 @@ public class Main {
                 log.info("查询返回该订单支付成功: )");
 
                 AlipayTradeQueryResponse response = result.getResponse();
-                dumpResponse(response);
+                // dumpResponse(response);
 
                 log.info(response.getTradeStatus());
                 if (Utils.isListNotEmpty(response.getFundBillList())) {
@@ -397,7 +397,7 @@ public class Main {
 
         // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
         ExtendParams extendParams = new ExtendParams();
-        extendParams.setSysServiceProviderId("2088100200300400500");
+        extendParams.setSysServiceProviderId("2088100200300400502");  // 用的时候把最后的 2 改为 0
 
         // 支付超时，定义为120分钟
         String timeoutExpress = "120m";
@@ -428,7 +428,7 @@ public class Main {
                 log.info("支付宝预下单成功: )");
 
                 AlipayTradePrecreateResponse response = result.getResponse();
-                dumpResponse(response);
+                // dumpResponse(response);
 
                 // 需要修改为运行机器上的路径
                 String filePath = String.format("/Users/sudo/Desktop/qr-%s.png",
