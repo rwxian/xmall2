@@ -28,7 +28,7 @@ import java.util.Map;
  * @date 2019/4/26 15:45
  */
 @Controller
-@RequestMapping("/manager/product/")
+@RequestMapping("/manage/product/")
 public class ProductManageController {
 
     @Autowired
