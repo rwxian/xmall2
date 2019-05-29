@@ -49,7 +49,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ServerResponse saveOrUpdateProduct(Product product) {
         if (product != null) {      // 产品不为空
-            if (StringUtils.isBlank(product.getSubImages())) {  // 如果子图不为空
+            if (StringUtils.isNotBlank(product.getSubImages())) {  // 如果子图不为空
                 String[] subImgArray = product.getSubImages().split(","); // 获取每张图片
                 if (subImgArray.length > 0) {   // 图片存在
                     product.setMainImage(subImgArray[0]); // 把第一张图设为主图
@@ -256,6 +256,10 @@ public class ProductServiceImpl implements IProductService {
             }
             categoryIdList = iCategoryService.selectCategoryAndChildrenById(categoryId).getData(); // 根据分类id查询出此id下的所有子分类
         }
+        if(StringUtils.isNotBlank(keyword)){
+            keyword = new StringBuilder().append("%").append(keyword).append("%").toString();
+        }
+
         PageHelper.startPage(pageNum, pageSize);
         // 排序处理
         if (StringUtils.isNotBlank(orderBy)) {
