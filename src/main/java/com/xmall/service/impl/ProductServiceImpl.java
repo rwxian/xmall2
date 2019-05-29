@@ -197,8 +197,7 @@ public class ProductServiceImpl implements IProductService {
         List<Product> productsList = productMapper.selectByNameAndProductId(productName, productId); // 查询出所有产品
 
         List<ProductListVo> productListVoList = Lists.newArrayList(); // 声明一个list集合，并初始化
-        for (Product productItem :
-                productsList) {
+        for (Product productItem : productsList) {
             ProductListVo productListVo = assembleProductListVo(productItem);   // 把查询的所有Product对象封装成ProductListVo，过滤掉不需要的字段
             productListVoList.add(productListVo);   // 把封装好的ProductListVo添加到list中
         }

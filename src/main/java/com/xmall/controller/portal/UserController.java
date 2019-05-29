@@ -84,7 +84,7 @@ public class UserController {
         if (user != null) {         // 用户已经登录，把用户信息返回给页面
             return ServerResponse.createBySuccess(user);
         }
-        return ServerResponse.createByErrorMessage("用户为登录，无法获取用户信息！");
+        return ServerResponse.createByErrorMessage("用户未登录，无法获取用户信息！");
     }
 
     /**
@@ -121,6 +121,7 @@ public class UserController {
     @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        System.out.println("token是：" + forgetToken);
         return iUserService.forgetResetPassword(username, passwordNew, forgetToken);
     }
 
@@ -134,7 +135,7 @@ public class UserController {
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> resetPassword(HttpSession session, String passwordNew, String passwordOld) {
-        User user = (User) session.getAttribute(Const.USERNAME);
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorMessage("用户未登录！");
         }
@@ -150,7 +151,7 @@ public class UserController {
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse updateInformation(HttpSession session, User user) {
-        User currentUser = (User) session.getAttribute(Const.USERNAME);     // 从session中获取当前登录用户
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);     // 从session中获取当前登录用户
         if (currentUser == null) {
             return ServerResponse.createByErrorMessage("用户未登录!");
         }

@@ -173,7 +173,7 @@
     <select id="selectQuestionByUsername" resultType="java.lang.String" parameterType="string">
       select
       question
-      from mall_user
+      from mmall_user
       where username = #{username}
     </select>
   <select id="checkAnswer" resultType="java.lang.Integer">

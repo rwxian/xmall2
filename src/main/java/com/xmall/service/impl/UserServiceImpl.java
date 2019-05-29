@@ -154,7 +154,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
-        if (StringUtils.isNoneBlank(forgetToken)) {                             // 判断页面传递过来的token
+        if (StringUtils.isBlank(forgetToken)) {                             // 判断页面传递过来的token
             return ServerResponse.createByErrorMessage("参数错误，token不能为空");
         }
 
