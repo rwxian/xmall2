@@ -185,13 +185,14 @@
     from mmall_product
     order by id asc
   </select>
-  <select id="selectByNameAndProductId" resultType="com.xmall.pojo.Product">
+
+  <select id="selectByNameAndProductId" resultMap="BaseResultMap" parameterType="map">
     select
     <include refid="Base_Column_List"/>
     from mmall_product
     <where>
       <if test="productName != null">
-        where name = #{productName}
+        and name like #{productName}
       </if>
       <if test="productId != null">
         and id = #{productId}

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -194,11 +195,14 @@ public class ProductServiceImpl implements IProductService {
         if (StringUtils.isNotBlank(productName)) {
             productName = new StringBuilder().append("%").append(productName).append("%").toString();// 拼接sql需要的%
         }
+        System.out.println("用于搜索的产品关键字为：" + productName);
+
         List<Product> productsList = productMapper.selectByNameAndProductId(productName, productId); // 查询出所有产品
 
         List<ProductListVo> productListVoList = Lists.newArrayList(); // 声明一个list集合，并初始化
         for (Product productItem : productsList) {
             ProductListVo productListVo = assembleProductListVo(productItem);   // 把查询的所有Product对象封装成ProductListVo，过滤掉不需要的字段
+            System.out.println("--------" + productListVo);
             productListVoList.add(productListVo);   // 把封装好的ProductListVo添加到list中
         }
         PageInfo pageResult = new PageInfo(productsList);   // 通过PageInfo的构造对list中的ProductListVo进行自动分页处理，可得到多少页、多少记录等信息
