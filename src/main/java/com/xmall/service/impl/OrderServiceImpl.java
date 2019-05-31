@@ -240,7 +240,7 @@ public class OrderServiceImpl implements IOrderService {
         orderVo.setOrderNo(order.getOrderNo());
         orderVo.setPayment(order.getPayment());
         orderVo.setPaymentType(order.getPaymentType());
-        orderVo.setPaymentTypeDesc(Const.PaymentTypeEnum.codeOf(order.getStatus()).getValue()); // 使用枚举，禁止硬编码，利于扩展
+        orderVo.setPaymentTypeDesc(Const.PaymentTypeEnum.codeOf(order.getPaymentType()).getValue()); // 使用枚举，禁止硬编码，利于扩展
         orderVo.setPostage(order.getPostage());
         orderVo.setStatus(order.getStatus());
         orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());      // 使用枚举，禁止硬编码，利于扩展
@@ -486,7 +486,7 @@ public class OrderServiceImpl implements IOrderService {
                 order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode());
                 order.setSendTime(new Date());
                 int rowCount = orderMapper.updateByPrimaryKeySelective(order);
-                if (rowCount > 1) {
+                if (rowCount > 0) {
                     return ServerResponse.createBySuccess("发货成功！");
                 }
                 return ServerResponse.createByErrorMessage("发货失败！");

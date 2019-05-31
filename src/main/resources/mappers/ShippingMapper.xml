@@ -204,14 +204,14 @@
     and user_id = #{userId,jdbcType=INTEGER}
   </update>
 
-  <select id="selectByShippingIdUserId" resultType="com.xmall.pojo.Shipping">
+  <select id="selectByShippingIdUserId" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List"/>
     from mmall_shipping
     where id = #{shippingId}
     and user_id = #{userId}
   </select>
-  <select id="selectByUserId" resultType="com.xmall.pojo.Shipping">
+  <select id="selectByUserId" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List"/>
     from mmall_shipping
