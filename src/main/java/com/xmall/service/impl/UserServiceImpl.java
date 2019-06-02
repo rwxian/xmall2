@@ -210,7 +210,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public ServerResponse updateInformation(User user) {
-        int reslutCount = userMapper.checkEmail(user.getEmail());       // 查询更改后的邮箱是否存在，不包含当前账户使用的邮箱
+        int reslutCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());       // 查询更改后的邮箱是否存在，不包含当前账户使用的邮箱
         if (reslutCount > 0) {
             return ServerResponse.createByErrorMessage("email已存在，请更换email在继续！");
         }

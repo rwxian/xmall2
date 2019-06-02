@@ -178,15 +178,18 @@ public class OrderController {
         params.remove("sign_type");     // 移除sign_type参数，验签不需要
         try {
             boolean alipayRSACheckV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
+            System.out.println("开始验签了！");
 
             if (!alipayRSACheckV2) {    // 验签不通过
+                System.out.println("验签不通过！");
                 return ServerResponse.createByErrorMessage("非法请求，验证不通过，再恶意请求就报警找网警了！！！");
             }
+            System.out.println("恭喜您，验签通过了！");
         } catch (AlipayApiException e) {
             logger.error("支付宝验证回调异常！", e);
         }
         // todo 验证各种数据，放在service
-
+        System.out.println("准备调用service的方法！！");
         ServerResponse serverResponse = iOrderService.aliCallback(params);
         if (serverResponse.isSucess()) {
             return Const.AlipayCallback.RESPONSE_SUCCESS;

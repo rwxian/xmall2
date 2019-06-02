@@ -653,28 +653,32 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 支付宝回调后，更新订单状态，库存等
+     * 支付宝回调方法被回调后，更新订单状态，库存等
      * @param params
      * @return
      */
     @Override
     public ServerResponse aliCallback(Map<String, String> params) {
+        System.out.println("开始调用服务器层的回调函数！");
         Long orderNo = Long.parseLong(params.get("out_order_no"));
         String tradeNo = params.get("trade_no");
         String tradeStatus = params.get("trade_status");
         Order order = orderMapper.selectByOrderNo(orderNo);
         if (order == null) {
-            return ServerResponse.createByErrorMessage("非本商城的订单，回调忽略");
+            System.out.println("非本商城的订单，回调忽略");
+            return ServerResponse.createByErrorMessage("非本商城的订单，回调忽略！");
         }
         if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()) {
+            System.out.println("支付宝重复回调！");
             return ServerResponse.createBySuccess("支付宝重复回调！");
         }
         if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCESS.equals(tradeStatus)) {
             order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));    // 支付时间
             order.setStatus(Const.OrderStatusEnum.PAID.getCode());
             orderMapper.updateByPrimaryKeySelective(order); // 更新订单状态为已付款
+            System.out.println("更新订单状态了！");
         }
-
+        System.out.println("准备封装支付信息！");
         PayInfo payInfo = new PayInfo();
         payInfo.setUserId(order.getUserId());
         payInfo.setOrderNo(order.getOrderNo());
@@ -683,6 +687,7 @@ public class OrderServiceImpl implements IOrderService {
         payInfo.setPlatformStatus(tradeStatus);
 
         payInfoMapper.insert(payInfo);
+        System.out.println("插入订单信息成功！");
 
         return ServerResponse.createBySuccess();
     }
