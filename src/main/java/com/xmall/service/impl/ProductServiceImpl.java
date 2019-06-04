@@ -125,14 +125,14 @@ public class ProductServiceImpl implements IProductService {
         productDetailVo.setSubTitle(product.getSubtitle());
         productDetailVo.setPrice(product.getPrice());
         productDetailVo.setMainImage(product.getMainImage());
-        productDetailVo.setSubImage(product.getSubImages());
+        productDetailVo.setSubImages(product.getSubImages());
         productDetailVo.setCategoryId(product.getCategoryId());
         productDetailVo.setDetail(product.getDetail());
         productDetailVo.setName(product.getName());
         productDetailVo.setStatus(product.getStatus());
         productDetailVo.setStock(product.getStock());
 
-        productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
+        productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.s-rwxian.cn/"));
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category != null) {
             productDetailVo.setParentCategoryId(0);
