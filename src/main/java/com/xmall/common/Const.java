@@ -30,7 +30,7 @@ public class Const {
         int CHECKED = 1;    // 购物车中商品选中状态
         int UN_CHECKED = 0; // 购物车中商品未选中状态
 
-        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";   // 限制失败
+        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";       // 限制失败
         String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS"; // 限制成功
     }
 
@@ -109,8 +109,8 @@ public class Const {
         String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";  // 等待买家付款
         String TRADE_STATUS_TRADE_SUCESS = "TRADE_SUCESS";  // 付款成功
 
-        String RESPONSE_SUCCESS = "success";
-        String RESPONSE_FAILED = "failed";
+        String RESPONSE_SUCCESS = "success";    // 付款成功
+        String RESPONSE_FAILED = "failed";      // 付款失败
     }
 
     /**
