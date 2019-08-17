@@ -7,7 +7,7 @@ import redis.clients.jedis.Jedis;
 
 /**
  * @ClassName RedisPoolUtil
- * @Description: Redis API封装与调试
+ * @Description: Redis API的封装类
  * @Author rwxian
  * @Date 2019/8/16 13:59
  * @Version V1.0
@@ -31,7 +31,7 @@ public class RedisPoolUtil {
             jedis = RedisPool.getJedis();   // 获取一个redis连接
             result = jedis.set(key, value); // 把数据插入到redis
         } catch (final Exception e) {
-            logger.error("set key{}, value{} 时发生错误！", key, value, e);
+            logger.error("set key:{}, value:{} 时发生错误！", key, value, e);
             RedisPool.returnBrokenResource(jedis);  // 发生异常，把连接放入坏的池里面
         }
         RedisPool.returnResource(jedis);    // 释放连接
@@ -52,9 +52,10 @@ public class RedisPoolUtil {
 
         try {
             jedis = RedisPool.getJedis();   // 获取一个redis连接
-            result = jedis.get(key); // 把数据插入到redis
+            result = jedis.get(key); // 根据键获取值
+            logger.info("根据--key:{}--从Redis中获取对应的值", key);
         } catch (final Exception e) {
-            logger.error("get key{} 时发生错误！", key, e);
+            logger.error("get key:{} 时发生错误！", key, e);
             RedisPool.returnBrokenResource(jedis);  // 发生异常，把连接放入坏的池里面
         }
         RedisPool.returnResource(jedis);    // 释放连接
@@ -75,8 +76,9 @@ public class RedisPoolUtil {
         try {
             jedis = RedisPool.getJedis();
             result = jedis.del(key);
+            logger.info("删除Redis中存储的--key:{}--", key);
         } catch (final Exception e) {
-            logger.error("del key{} 时出错！", key, e);
+            logger.error("del key:{} 时出错！", key, e);
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -97,8 +99,9 @@ public class RedisPoolUtil {
         try {
             jedis = RedisPool.getJedis();   // 获取一个redis连接
             result = jedis.setex(key, exTime, value); // 把数据插入到redis
+            logger.info("向Redis存入值--key:{}, value:{}, exTime:{}--!", key, value, exTime);
         } catch (final Exception e) {
-            logger.error("set key{}, value{} 时发生错误！", key, value, e);
+            logger.error("set-- key:{}, value:{} --时发生错误！", key, value, e);
             RedisPool.returnBrokenResource(jedis);  // 发生异常，把连接放入坏的池里面
         }
         RedisPool.returnResource(jedis);    // 释放连接
@@ -119,10 +122,11 @@ public class RedisPoolUtil {
         try {
             jedis = RedisPool.getJedis();
             result = jedis.expire(key, exTime);
+            logger.info("向Redis设置--key:{}--的过期时间为--exTime:{}秒-- !", key, exTime);
         } catch (final Exception e) {
-            logger.error("expire key{} 时出错！", key, e);
+            logger.error("expire key:{} 时出错！", key, e);
         }
-        RedisPool.returnResource(jedis);
+        RedisPool.returnResource(jedis);    // 释放连接
         return result;
     }
 }

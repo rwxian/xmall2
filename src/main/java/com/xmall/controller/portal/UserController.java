@@ -35,8 +35,8 @@ public class UserController {
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> login(String username, String password, HttpSession session,
-                                      HttpServletRequest request, HttpServletResponse httpServletResponse) {
-        ServerResponse<User> response = iUserService.login(username, password);
+                                      HttpServletResponse httpServletResponse) {
+        ServerResponse<User> response = iUserService.login(username, password);     // 校验用户信息
         if (response.isSucess()) {      // 登录成功，把用户信息保存到session
             // session.setAttribute(Const.CURRENT_USER, response.getData());
 
@@ -49,14 +49,23 @@ public class UserController {
     }
 
     /**
-     * 用户登出
-     * @param session
-     * @return
+     * @MethodName: logout
+     * @Description: 用户登出
+     * @Param: [request]
+     * @Return: com.xmall.common.ServerResponse<java.lang.String>
+     * @Author: rwxian
+     * @Date: 2019/8/17 18:16
      */
     @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> logout(HttpSession session) {
-        session.removeAttribute(Const.CURRENT_USER);    // 清除用户对应的session信息
+    public ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        // session.removeAttribute(Const.CURRENT_USER);    // 清除用户对应的session信息
+        String loginToken = CookieUtil.readLoginToken(request);     // 从请求中获取登录Token
+        CookieUtil.deleteLoginToken(request, response);             // 删除登录Cookie
+        Long del = RedisPoolUtil.del(loginToken);                   // 删除Redis中存储的Token
+        /*if (del == 1L) {
+            return ServerResponse.createBySuccess();
+        }*/
         return ServerResponse.createBySuccess();
     }
 
@@ -84,14 +93,20 @@ public class UserController {
     }
 
     /**
-     * 获取用户信息
-     * @param session
-     * @return
+     * @MethodName: getUserInfo
+     * @Description: 获取用户信息
+     * @Param: [request]
+     * @Return: com.xmall.common.ServerResponse<com.xmall.pojo.User>
+     * @Author: rwxian
+     * @Date: 2019/8/17 18:13
      */
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> getUserInfo(HttpServletRequest request) {
+        // User user = (User) session.getAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
         if (user != null) {         // 用户已经登录，把用户信息返回给页面
             return ServerResponse.createBySuccess(user);
         }
