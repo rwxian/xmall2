@@ -26,6 +26,13 @@ public class Const {
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc", "price_desc");
     }
 
+    /**
+     * session超时时间
+     */
+    public interface RedisCacheExtime {
+        int REDIS_CACHE_EXTIME = 60 * 30;   // 30分钟
+    }
+
     public interface Cart {
         int CHECKED = 1;    // 购物车中商品选中状态
         int UN_CHECKED = 0; // 购物车中商品未选中状态
