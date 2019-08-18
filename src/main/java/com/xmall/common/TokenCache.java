@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author rwxian@foxmail.com
  * @date 2019/4/14 15:13
- * 这个类使用Guava工具把Token保存到本地缓存中
+ * 使用Guava工具把Token保存到本地缓存中
  */
 public class TokenCache {
     private static Logger logger = LoggerFactory.getLogger(TokenCache.class);   //logback日志记录器

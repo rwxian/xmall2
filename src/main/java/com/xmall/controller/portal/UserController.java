@@ -8,6 +8,7 @@ import com.xmall.service.IUserService;
 import com.xmall.util.CookieUtil;
 import com.xmall.util.JsonUtil;
 import com.xmall.util.RedisPoolUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,9 @@ public class UserController {
     public ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
         // session.removeAttribute(Const.CURRENT_USER);    // 清除用户对应的session信息
         String loginToken = CookieUtil.readLoginToken(request);     // 从请求中获取登录Token
+        if(StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
+        }
         CookieUtil.deleteLoginToken(request, response);             // 删除登录Cookie
         Long del = RedisPoolUtil.del(loginToken);                   // 删除Redis中存储的Token
         /*if (del == 1L) {
@@ -105,6 +109,9 @@ public class UserController {
     public ServerResponse<User> getUserInfo(HttpServletRequest request) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        if(StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
+        }
         String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
         if (user != null) {         // 用户已经登录，把用户信息返回给页面
@@ -120,7 +127,7 @@ public class UserController {
      */
     @RequestMapping(value = "forget_get_question.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetGetQuestion(String username) {
+    public ServerResponse forgetGetQuestion(String username) {
         return iUserService.selectQuestion(username);
     }
 
@@ -153,15 +160,19 @@ public class UserController {
 
     /**
      * 登录状态下的密码更改
-     * @param session
+     * @param request
      * @param passwordNew
      * @param passwordOld
      * @return
      */
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session, String passwordNew, String passwordOld) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> resetPassword(HttpServletRequest request, String passwordNew, String passwordOld) {
+        // User user = (User) session.getAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
+
         if (user == null) {
             return ServerResponse.createByErrorMessage("用户未登录！");
         }
@@ -170,36 +181,47 @@ public class UserController {
 
     /**
      * 登录状态下进行信息更新
-     * @param session
+     * @param request
      * @param user
      * @return
      */
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse updateInformation(HttpSession session, User user) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);     // 从session中获取当前登录用户
+    public ServerResponse<User> updateInformation(HttpServletRequest request, User user) {
+        // User currentUser = (User) session.getAttribute(Const.CURRENT_USER);     // 从session中获取当前登录用户
+        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        User currentUser = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json，为登录用户
         if (currentUser == null) {
             return ServerResponse.createByErrorMessage("用户未登录!");
         }
+
         user.setId(currentUser.getId());    // 为防止横向越权问题，把用户id设置成当前用户的id
         user.setUsername(currentUser.getUsername());
         ServerResponse<User> serverResponse = iUserService.updateInformation(user);  // 更新信息
         if (serverResponse.isSucess()) {    // 更新成功
-            serverResponse.getData().setUsername(currentUser.getUsername());        // 设置用户名
-            session.setAttribute(Const.CURRENT_USER, serverResponse.getData());     // 把更新后的信息存入session中
+            serverResponse.getData().setUsername(user.getUsername());        // 设置用户名
+            // session.setAttribute(Const.CURRENT_USER, serverResponse.getData());     // 把更新后的信息存入session中
+            RedisPoolUtil.setEx(loginToken, JsonUtil.objectToString(serverResponse.getData()), Const.RedisCacheExtime.REDIS_CACHE_EXTIME);
         }
         return serverResponse;
     }
 
     /**
      * 获取用户详细信息
-     * @param session
+     * @param request
      * @return
      */
     @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getInformation(HttpSession session) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER); // 从session中获取当前登录用户
+    public ServerResponse<User> getInformation(HttpServletRequest request) {
+        // User currentUser = (User) session.getAttribute(Const.CURRENT_USER); // 从session中获取当前登录用户
+        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        if(StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
+        }
+        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        User currentUser = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json，为登录用户
         if (currentUser == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "未登录，需要强制登录!status=10");
         }
