@@ -243,11 +243,19 @@
       <version>2.6.0</version>
     </dependency>
 
+    <!--Spring Session框架依赖-->
+    <!-- https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis -->
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-data-redis</artifactId>
+      <version>1.2.0.RELEASE</version>
+    </dependency>
+
+
 
     <!-- 二次开发新增结束 -->
 
   </dependencies>
-
 
   <build>
     <finalName>xmall</finalName>

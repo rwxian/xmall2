@@ -8,7 +8,7 @@ import com.xmall.pojo.User;
 import com.xmall.service.IShippingService;
 import com.xmall.util.CookieUtil;
 import com.xmall.util.JsonUtil;
-import com.xmall.util.RedisPoolUtil;
+import com.xmall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,7 @@ public class ShippingController {
     public ServerResponse add(HttpServletRequest request, Shipping shipping) {
         // User currentUser = (User) session.getAttribute(Const.CURRENT_USER); // 从session中获取当前登录用户
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -61,7 +61,7 @@ public class ShippingController {
     public ServerResponse del(HttpServletRequest request, Integer shippingId) {
         // User currentUser = (User) session.getAttribute(Const.CURRENT_USER); // 从session中获取当前登录用户
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -81,7 +81,7 @@ public class ShippingController {
     public ServerResponse del(HttpServletRequest request, Shipping shipping) {
         // User currentUser = (User) session.getAttribute(Const.CURRENT_USER); // 从session中获取当前登录用户
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -104,7 +104,7 @@ public class ShippingController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -130,7 +130,7 @@ public class ShippingController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {

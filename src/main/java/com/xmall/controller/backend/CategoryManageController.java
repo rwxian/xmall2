@@ -1,14 +1,8 @@
 package com.xmall.controller.backend;
 
-import com.xmall.common.ResponseCode;
 import com.xmall.common.ServerResponse;
-import com.xmall.pojo.User;
 import com.xmall.service.ICategoryService;
 import com.xmall.service.IUserService;
-import com.xmall.util.CookieUtil;
-import com.xmall.util.JsonUtil;
-import com.xmall.util.RedisPoolUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,11 +39,11 @@ public class CategoryManageController {
     public ServerResponse addCategory(HttpServletRequest request, String categoryName,
                                       @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
-        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        /*String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -61,7 +55,10 @@ public class CategoryManageController {
             return iCategoryService.addCategory(categoryName, parentId);
         } else {
             return ServerResponse.createByErrorMessage("无操作权限，需要管理员权限！");
-        }
+        }*/
+
+        // 拦截器已验证身份
+        return iCategoryService.addCategory(categoryName, parentId);
     }
 
     /**
@@ -76,11 +73,11 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse setCategoryName(HttpServletRequest request, Integer categoryId, String categoryName) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
-        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        /*String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -90,7 +87,10 @@ public class CategoryManageController {
             return iCategoryService.updateCategoryName(categoryId, categoryName);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限！");
-        }
+        }*/
+
+        // 拦截器已验证身份
+        return iCategoryService.updateCategoryName(categoryId, categoryName);
     }
 
     /**
@@ -104,11 +104,11 @@ public class CategoryManageController {
     public ServerResponse getChildrenParallelCategory(HttpServletRequest request,
                                                       @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
-        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        /*String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录！");
@@ -118,7 +118,11 @@ public class CategoryManageController {
             return iCategoryService.getChildrenParallerCategory(categoryId);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限！");
-        }
+        }*/
+
+        // 拦截器已验证身份
+        // 查询子节点的分类信息，并且不递归，保持平级
+        return iCategoryService.getChildrenParallerCategory(categoryId);
     }
 
     /**
@@ -132,11 +136,11 @@ public class CategoryManageController {
     public ServerResponse getCategoryAndDeepChildrenCategory(HttpServletRequest request,
                                                             @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
-        String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
+        /*String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录！");
@@ -146,6 +150,9 @@ public class CategoryManageController {
             return iCategoryService.selectCategoryAndChildrenById(categoryId);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限！");
-        }
+        }*/
+
+        // 拦截器已验证身份
+        return iCategoryService.selectCategoryAndChildrenById(categoryId);
     }
 }

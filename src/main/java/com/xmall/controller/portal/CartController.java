@@ -7,7 +7,7 @@ import com.xmall.pojo.User;
 import com.xmall.service.ICartService;
 import com.xmall.util.CookieUtil;
 import com.xmall.util.JsonUtil;
-import com.xmall.util.RedisPoolUtil;
+import com.xmall.util.RedisShardedPoolUtil;
 import com.xmall.vo.CartVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -69,7 +69,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -94,7 +94,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -117,7 +117,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -140,7 +140,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -163,7 +163,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -187,7 +187,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -211,7 +211,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {
@@ -234,7 +234,7 @@ public class CartController {
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
-        String userString = RedisPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
+        String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
         User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
 
         if (user == null) {

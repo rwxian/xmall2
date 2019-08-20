@@ -6,7 +6,7 @@ import com.xmall.dao.UserMapper;
 import com.xmall.pojo.User;
 import com.xmall.service.IUserService;
 import com.xmall.util.MD5Util;
-import com.xmall.util.RedisPoolUtil;
+import com.xmall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -140,7 +140,7 @@ public class UserServiceImpl implements IUserService {
             // 问题及问题答案与用户名对应，并且正确
             String forgetToken = UUID.randomUUID().toString();                     // 使用UUID生成Token
             // TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);    // 调用TokenCache把Token放入到服务器缓存
-            RedisPoolUtil.setEx(Const.TOKEN_PREFIX + username, forgetToken, 60 * 60 * 12);    // 把缓存迁移到redis
+            RedisShardedPoolUtil.setEx(Const.TOKEN_PREFIX + username, forgetToken, 60 * 60 * 12);    // 把缓存迁移到redis
             return ServerResponse.createBySuccess(forgetToken);
         }
         return ServerResponse.createByErrorMessage("问题的答案错误！");
@@ -165,7 +165,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         // String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);   // 从本地缓存中获取token
-        String token = RedisPoolUtil.get(Const.TOKEN_PREFIX + username);        // 从redis中获取缓存token
+        String token = RedisShardedPoolUtil.get(Const.TOKEN_PREFIX + username);        // 从redis中获取缓存token
         if (StringUtils.isBlank(token)) {                                       // 判断缓存里的token是否为空
             return ServerResponse.createByErrorMessage("token无效或者过期");
         }
