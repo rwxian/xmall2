@@ -137,6 +137,46 @@ public class RedisShardedPoolUtil {
         return result;
     }
 
+    /**
+     * @MethodName: setnx
+     * @Description: 向redis添加键值对，具有原子性
+     * @Param: [key, value]
+     * @Return: java.lang.Long
+     * @Author: rwxian
+     * @Date: 2019/8/21 15:04
+     */
+    public static Long setNx(String key, String value) {
+        ShardedJedis jedis = null;
+        Long result  = null;
+
+        try {
+            jedis = RedisShardedPool.getJedis();   // 获取一个redis连接
+            result = jedis.setnx(key, value); // 把数据插入到redis
+        } catch (final Exception e) {
+            logger.error("set key:{}, value:{} 时发生错误！", key, value, e);
+            RedisShardedPool.returnBrokenResource(jedis);  // 发生异常，把连接放入坏的池里面
+            return result;
+        }
+        RedisShardedPool.returnResource(jedis);    // 释放连接
+        return result;
+    }
+
+    public static String getSet(String key, String value) {
+        ShardedJedis jedis = null;
+        String result  = null;
+
+        try {
+            jedis = RedisShardedPool.getJedis();   // 获取一个redis连接
+            result = jedis.getSet(key, value); // 把数据插入到redis
+        } catch (final Exception e) {
+            logger.error("getSet key:{}, value:{} 时发生错误！", key, value, e);
+            RedisShardedPool.returnBrokenResource(jedis);  // 发生异常，把连接放入坏的池里面
+            return result;
+        }
+        RedisShardedPool.returnResource(jedis);    // 释放连接
+        return result;
+    }
+
     public static void main(String[] args) {
         ShardedJedis jedis = RedisShardedPool.getJedis();
 

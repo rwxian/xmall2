@@ -29,6 +29,7 @@ import com.xmall.vo.OrderVo;
 import com.xmall.vo.ShippingVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,7 +497,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-
     // 支付模块
 
     /**
@@ -708,6 +708,38 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByError();
+    }
+
+    /**
+     * @MethodName: closeOrder
+     * @Description: 用于支持定时任务关闭超时未支付订单
+     * @Param: [hour]
+     * @Return: void
+     * @Author: rwxian
+     * @Date: 2019/8/20 23:43
+     */
+    @Override
+    public void closeOrder(int hour) {
+        Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+        List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(),
+                DateTimeUtil.dateToStr(closeDateTime));     // 查询未支付订单
+        for (Order order : orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());    // 根据订单编号查询购买的商品有哪些
+            for (OrderItem orderItem : orderItemList) {
+
+                // 一定要使用主键作为where条件，形成行级锁，防止锁表。同时是必须支持mysql的InnoDB
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId()); // 根据商品编号查询库存
+                if (stock == null) {    // 考虑到已生成的订单里的商品被删除的情况
+                    continue;
+                }
+                Product product = new Product();
+                product.setId(orderItem.getId());
+                product.setStatus(stock + orderItem.getQuantity());     // 新的库存为：原有的库存+将要关闭的订单中包含的商品的数量
+                productMapper.updateByPrimaryKeySelective(product);     // 更新商品库存
+            }
+            orderMapper.closeOrderByOrderId(order.getId());             // 关闭超时未支付订单
+            logger.info("通过定时任务关闭超时未支付的订单-OrderNo:{}", order.getOrderNo());
+        }
     }
 
 }

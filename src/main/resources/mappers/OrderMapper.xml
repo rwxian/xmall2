@@ -200,8 +200,6 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-
-
   <!--根据用户id和订单号查询是否存在此条订单-->
   <select id="selectByUserIdOrderNo" resultMap="BaseResultMap">
     select
@@ -229,4 +227,22 @@
     from mmall_order
     order by create_time desc
   </select>
+
+  <select id="selectOrderStatusByCreateTime" resultType="com.xmall.pojo.Order">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_order
+    where status = #{status};
+    <![CDATA[
+    and create_time <= #{date}
+    ]]>
+    order by create_time desc;
+  </select>
+
+  <update id="closeOrderByOrderId">
+    update mmall_order
+    set status = 0
+    where id = #{id}
+  </update>
+
 </mapper>
