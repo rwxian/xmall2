@@ -53,6 +53,7 @@ public class OrderController {
     @ResponseBody
     public ServerResponse create(HttpServletRequest request, Integer shippingId) {
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
+        // TODO 优化登录验证代码
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
@@ -233,7 +234,7 @@ public class OrderController {
             logger.error("支付宝验证回调异常！", e);
         }
         // todo 验证各种数据，放在service
-        System.out.println("准备调用service的方法！！");
+
         ServerResponse serverResponse = iOrderService.aliCallback(params);
         if (serverResponse.isSucess()) {
             return Const.AlipayCallback.RESPONSE_SUCCESS;

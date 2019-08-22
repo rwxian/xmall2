@@ -1,10 +1,12 @@
 package com.xmall.task;
 
 import com.xmall.common.Const;
+import com.xmall.common.RedissonManager;
 import com.xmall.service.IOrderService;
 import com.xmall.util.PropertiesUtil;
 import com.xmall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName CloseOrderTask
@@ -27,6 +30,8 @@ public class CloseOrderTask {
 
     @Autowired
     private IOrderService iOrderService;
+
+    @Autowired private RedissonManager redissonManager;
 
     /**
      * @MethodName: closeOrderTaskV1
@@ -67,13 +72,13 @@ public class CloseOrderTask {
 
     /**
      * @MethodName: closeOrderTaskV3
-     * @Description: Redis分布式锁实现定时关单，做到双重防死锁
+     * @Description: 手动实现的Redis分布式锁定时关单，做到双重防死锁
      * @Param: []
      * @Return: void
      * @Author: rwxian
      * @Date: 2019/8/21 18:54
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    // @Scheduled(cron = "0 */1 * * * ?")
     public void closeOrderTaskV3() {
         logger.info("关闭订单定时任务启动");
         long lockTimeOut = Long.parseLong(PropertiesUtil.getProperty("lock.time", "5000"));    // 分布式锁锁定时长
@@ -104,6 +109,45 @@ public class CloseOrderTask {
         logger.info("关闭订单定时任务结束");
     }
 
+    /**
+     * @MethodName: closeOrderTaskV4
+     * @Description: Redisson实现的分布式锁，但不支持一致性算法，需要使用单独的Redis部署
+     * @Param: []
+     * @Return: void
+     * @Author: rwxian
+     * @Date: 2019/8/22 11:34
+     */
+    // @Scheduled(cron = "0 */1 * * * ?")
+    public void closeOrderTaskV4() {
+        RLock lock = redissonManager.getRedisson().getLock(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK); // 通过Redisson实例获取Redisson锁
+        boolean getLock = false;    // 是否获取锁
+        try {
+            //  让集群中的tomcat自己竞争锁，wait_time要设置未0，否则就可能出现两个tomcat同时获取到锁的情况，同时设置5秒后释放锁
+            getLock = lock.tryLock(0, 5, TimeUnit.SECONDS);
+            if (getLock) {
+                logger.info("Redisson获取到分布式锁：{},ThreadName:{}!", Thread.currentThread().getName());
+                int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time", "2"));
+                iOrderService.closeOrder(hour);     // 关闭订单
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if (!getLock) {
+                return;
+            }
+            lock.unlock();
+            logger.info("释放Redisson分布式锁！");
+        }
+    }
+
+    /**
+     * @MethodName: closeOrder
+     * @Description: 竞争锁成功后，关闭订单
+     * @Param: [lockName]
+     * @Return: void
+     * @Author: rwxian
+     * @Date: 2019/8/22 11:35
+     */
     private void closeOrder(String lockName) {
         RedisShardedPoolUtil.expire(lockName, 5);       // 设置锁的超时时间为5秒，5秒后自动销毁，防止死锁
         logger.info("获取锁：{},ThreadName:{}!", lockName, Thread.currentThread().getName());

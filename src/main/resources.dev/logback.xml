@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--日志存放目录-->
+    <property name="LOG_NAME" value="${CATALINA_HOME/logs}"/>
+
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <!--<encoding>UTF-8</encoding>-->
         <encoder>
@@ -12,9 +15,9 @@
 
     <appender name="xmall" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/mmall.log</File>-->
-        <File>/usr/tomcat/apache-tomcat-8.5.38/logs/xmall/xmall.log</File>
+        <File>${LOG_HOME}/xmall/xmall.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/usr/tomcat/apache-tomcat-8.5.38/logs/xmall/xmall.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/xmall/xmall.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
             <append>true</append>
             <maxHistory>10</maxHistory>
         </rollingPolicy>
@@ -26,9 +29,9 @@
 
     <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/error.log</File>-->
-        <File>/usr/tomcat/apache-tomcat-8.5.38/logs/xmall/xmall_error.log</File>
+        <File>${LOG_HOME}/xmall/xmall_error.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/usr/tomcat/apache-tomcat-8.5.38/logs/xmall/xmall_error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/xmall/xmall_error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
             <!--<fileNamePattern>d:/mmalllog/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>-->
             <append>true</append>
             <maxHistory>10</maxHistory>
