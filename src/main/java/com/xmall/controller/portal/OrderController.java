@@ -30,7 +30,8 @@ import java.util.Set;
 /**
  * @author rwxian@foxmail.com
  * @date 2019/5/9 12:26
- * 支付宝接入的Controller
+ * 订单模块
+ * 支付宝接入
  */
 @Controller
 @RequestMapping("/order/")
@@ -171,7 +172,7 @@ public class OrderController {
     // 支付部分
 
     /**
-     * 支付功能
+     * 订单支付功能
      * @param orderNo
      * @param request
      * @return

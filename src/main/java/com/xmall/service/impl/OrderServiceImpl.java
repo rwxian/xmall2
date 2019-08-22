@@ -653,7 +653,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 支付宝回调方法被回调后，更新订单状态，库存等
+     * 扫码支付后，支付宝回调方法被回调后，更新订单状态，库存等
      * @param params
      * @return
      */
