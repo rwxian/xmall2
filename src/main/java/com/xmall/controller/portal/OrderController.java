@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -200,7 +201,7 @@ public class OrderController {
      * @param request
      * @return
      */
-    @RequestMapping("alipay_callback.do")
+    @RequestMapping(value = "alipay_callback.do", method = RequestMethod.POST)
     @ResponseBody
     public Object alipayCallBack(HttpServletRequest request) {
         HashMap<String, String> params = Maps.newHashMap();
@@ -223,8 +224,9 @@ public class OrderController {
         // 非常重要，验证回调的正确性，是不是支付宝发的，同时还要避免重复通知
         params.remove("sign_type");     // 移除sign_type参数，验签不需要
         try {
+            // 支付宝验证签名
             boolean alipayRSACheckV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
-            System.out.println("开始验签了！");
+            // System.out.println("开始验签了！");
 
             if (!alipayRSACheckV2) {    // 验签不通过
                 System.out.println("验签不通过！");
@@ -234,10 +236,13 @@ public class OrderController {
         } catch (AlipayApiException e) {
             logger.error("支付宝验证回调异常！", e);
         }
-        // todo 验证各种数据，放在service
 
+        // todo 验证支付宝回传的各种数据，查看是否是自己的订单，放在service
+
+        // 处理回调，判断是否已经支付，更新订单状态等
         ServerResponse serverResponse = iOrderService.aliCallback(params);
-        if (serverResponse.isSucess()) {
+        if (serverResponse.isSucess()) {        // 异步通知收到 ： WAIT_BUYER_PAY,TRADE_SUCCESS 都需要返回Success
+            logger.info("业务处理完成，向支付宝发送通知，让支付宝知晓已收到回调！支付状态：{}", params.get("trade_status"));
             return Const.AlipayCallback.RESPONSE_SUCCESS;
         }
         return Const.AlipayCallback.RESPONSE_FAILED;
@@ -252,6 +257,7 @@ public class OrderController {
     @RequestMapping("query_order_pay_status.do")
     @ResponseBody
     public ServerResponse<Boolean> alipayCallBack(HttpServletRequest request, Long orderNo) {
+        // TODO 如果用户一直停留在付款页面，未扫描，如果处理
         // User user = (User) session.getAttribute(Const.CURRENT_USER);
         String loginToken = CookieUtil.readLoginToken(request);     // 根据请求获取登录时存入客户端Cookie的登录Token
         if(StringUtils.isEmpty(loginToken)){

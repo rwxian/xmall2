@@ -19,7 +19,7 @@ public class CookieUtil {
 
     // 此处有一个坑，在tomcat8.5及以后的版本中，domain的开头不能加"."或者"-",否则验证domain是否正确时，
     // 会报java.lang.IllegalArgumentException: An invalid domain [] was specified for this cookie 异常
-    private final static String COOKIE_DOMAIN = "s-rwxian.cn";     // cookie作用域
+    private final static String COOKIE_DOMAIN = PropertiesUtil.getProperty("cookie.domain");     // cookie作用域
     private final static String COOKIE_NAME = "xmall_login_token";  // cookie名字
     private final static Logger logger = LoggerFactory.getLogger(CookieUtil.class);
 

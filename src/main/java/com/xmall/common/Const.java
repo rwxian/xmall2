@@ -111,14 +111,21 @@ public class Const {
     }
 
     /**
-     * 支付宝回调时的状态
+     * 支付宝回调时的状态，所传递的状态
      */
     public interface AlipayCallback {
-        String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";  // 等待买家付款
-        String TRADE_STATUS_TRADE_SUCESS = "TRADE_SUCESS";  // 付款成功
+        /*支付宝官方提供参数可以有下面结果
+        交易状态：
+        WAIT_BUYER_PAY（交易创建，等待买家付款）、
+        TRADE_CLOSED（未付款交易超时关闭，或支付完成后全额退款）、
+        TRADE_SUCCESS（交易支付成功）、
+        TRADE_FINISHED（交易结束，不可退款）*/
 
-        String RESPONSE_SUCCESS = "success";    // 付款成功
-        String RESPONSE_FAILED = "failed";      // 付款失败
+        String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";  // 等待买家付款
+        String TRADE_STATUS_TRADE_SUCESS = "TRADE_SUCCESS";     // 付款成功
+
+        String RESPONSE_SUCCESS = "success";      // 付款成功
+        String RESPONSE_FAILED = "failure";       // 付款失败
     }
 
     /**
