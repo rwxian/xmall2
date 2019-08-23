@@ -77,7 +77,7 @@ public class RedisShardedPool {
 
         // pool = new JedisPool(config, redisIp, redisPort, 1000 * 2);     // 实例化连接池
         JedisShardInfo info0 = new JedisShardInfo(redis0Ip, redis0Port, 1000 * 2);
-        // info0.setPassword(redis0Pass);     // 设置Redis密码
+        info0.setPassword(redis0Pass);     // 设置Redis密码
         JedisShardInfo info1 = new JedisShardInfo(redis1Ip, redis1Port, 1000 * 2);
         // info1.setPassword(redis1Pass);     // 设置Redis密码
 
