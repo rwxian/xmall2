@@ -177,7 +177,8 @@ public class RedisShardedPoolUtil {
         return result;
     }
 
-    public static void main(String[] args) {
+    // 测试
+    /*public static void main(String[] args) {
         ShardedJedis jedis = RedisShardedPool.getJedis();
 
         RedisPoolUtil.set("keyTest","value");
@@ -195,5 +196,5 @@ public class RedisShardedPoolUtil {
         System.out.println(aaa);
 
         System.out.println("end");
-    }
+    }*/
 }

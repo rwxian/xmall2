@@ -114,7 +114,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
         }
         String userString = RedisShardedPoolUtil.get(loginToken);          // 根据Token到Redis中读取登录用户的信息
-        User user = JsonUtil.stringToObject(userString, User.class);// 使用反序列化工具把String转换为Json
+        User user = JsonUtil.stringToObject(userString, User.class);    // 使用反序列化工具把String转换为Json
         if (user != null) {         // 用户已经登录，把用户信息返回给页面
             return ServerResponse.createBySuccess(user);
         }

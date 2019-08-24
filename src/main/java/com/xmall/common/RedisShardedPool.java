@@ -44,7 +44,7 @@ public class RedisShardedPool {
     private static Integer redis0Port = Integer.parseInt(PropertiesUtil.getProperty("redis0.port", "6379"));
 
     // redis0的密码
-    private static String redis0Pass = PropertiesUtil.getProperty("redis0.pass");
+    private static String redis0Pass = PropertiesUtil.getProperty("redis0.password");
 
     // redis1的ip地址
     private static String redis1Ip = PropertiesUtil.getProperty("redis1.ip");
@@ -53,7 +53,7 @@ public class RedisShardedPool {
     private static Integer redis1Port = Integer.parseInt(PropertiesUtil.getProperty("redis1.port", "6380"));
 
     // redis1的密码
-    private static String redis1Pass = PropertiesUtil.getProperty("redis1.pass");
+    private static String redis1Pass = PropertiesUtil.getProperty("redis1.password");
 
     private static final Logger logger = LoggerFactory.getLogger(RedisShardedPool.class);
 
@@ -75,10 +75,9 @@ public class RedisShardedPool {
         config.setTestOnReturn(testOnReturn);
         config.setBlockWhenExhausted(true); // 连接耗尽时，是否阻塞，false会抛出异常，true阻塞直到超时，默认为true
 
-        // pool = new JedisPool(config, redisIp, redisPort, 1000 * 2);     // 实例化连接池
         JedisShardInfo info0 = new JedisShardInfo(redis0Ip, redis0Port, 1000 * 2);
         info0.setPassword(redis0Pass);     // 设置Redis密码
-        JedisShardInfo info1 = new JedisShardInfo(redis1Ip, redis1Port, 1000 * 2);
+        // JedisShardInfo info1 = new JedisShardInfo(redis1Ip, redis1Port, 1000 * 2);
         // info1.setPassword(redis1Pass);     // 设置Redis密码
 
         List<JedisShardInfo> jedisShardInfoList = new ArrayList<>(1);   // Redis容器
