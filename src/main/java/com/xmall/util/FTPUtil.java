@@ -95,7 +95,7 @@ public class FTPUtil {
         try {
             ftpClient.connect(ip);  // 连接ftp服务器
             isSuccess = ftpClient.login(user, pwd); // 登录ftp服务器
-            logger.error("ftp服务器连接成功！");
+            logger.info("ftp服务器连接成功！");
         } catch (IOException e) {
             logger.error("连接ftp服务器失败！", e);
         }
