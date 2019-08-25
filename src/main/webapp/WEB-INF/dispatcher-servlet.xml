@@ -3,12 +3,17 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvn="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/mvc
 	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.xmall" annotation-config="true"/>
+    <!--bean扫描,关闭默认扫描-->
+    <context:component-scan base-package="com.xmall.controller" annotation-config="true" use-default-filters="false">
+        <!--SpringMVC只扫描Controller注解的类-->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <mvc:annotation-driven>
         <mvc:message-converters>
@@ -31,7 +36,6 @@
     </mvc:annotation-driven>
 
 
-
     <!-- SpringMVC文件上传 -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="10485760"/> <!-- 10m -->
@@ -39,5 +43,17 @@
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
 
+    <!--SpringMVC拦截器-->
+    <mvc:interceptors >
+        <!--定义在这里的所有的都会拦截-->
+        <mvc:interceptor>
+            <!-- ** 代表拦截manage目录下的包括子目录的请求-->
+            <!-- * 代表拦截manage下的所有请求，不包括子目录-->
+            <!--直接写 / 代表项目根目录下的所有请求-->
+            <mvc:mapping path="/manage/**"/>
+            <!--<mvc:exclude-mapping path="/manage/user/login.do"/>-->     <!--登录请求不走拦截器，也可以在拦截器类中判断-->
+            <bean class="com.xmall.controller.ctrlcommon.interceptor.AuthorityInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 </beans>

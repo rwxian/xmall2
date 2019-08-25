@@ -25,7 +25,7 @@ import java.util.Set;
 @Service("categoryService")
 public class CategoryServiceImpl implements ICategoryService {
 
-    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Autowired
     private CategoryMapper categoryMapper;

@@ -13,6 +13,7 @@ public class Const {
     public static final String CURRENT_USER = "currentUser";    // 当前用户
     public static final String EMAIL = "email";                 // 邮箱
     public static final String USERNAME = "username";
+    public static final String TOKEN_PREFIX = "token_";     //token前缀
 
     public interface Role {
         int ROLE_CUSTOMER = 0;  //普通用户
@@ -24,6 +25,13 @@ public class Const {
      */
     public interface ProductListOrderBy {
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc", "price_desc");
+    }
+
+    /**
+     * session超时时间
+     */
+    public interface RedisCacheExtime {
+        int REDIS_CACHE_EXTIME = 60 * 30;   // 30分钟
     }
 
     public interface Cart {
@@ -103,14 +111,21 @@ public class Const {
     }
 
     /**
-     * 支付宝回调时的状态
+     * 支付宝回调时的状态，所传递的状态
      */
     public interface AlipayCallback {
-        String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";  // 等待买家付款
-        String TRADE_STATUS_TRADE_SUCESS = "TRADE_SUCESS";  // 付款成功
+        /*支付宝官方提供参数可以有下面结果
+        交易状态：
+        WAIT_BUYER_PAY（交易创建，等待买家付款）、
+        TRADE_CLOSED（未付款交易超时关闭，或支付完成后全额退款）、
+        TRADE_SUCCESS（交易支付成功）、
+        TRADE_FINISHED（交易结束，不可退款）*/
 
-        String RESPONSE_SUCCESS = "success";    // 付款成功
-        String RESPONSE_FAILED = "failed";      // 付款失败
+        String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";  // 等待买家付款
+        String TRADE_STATUS_TRADE_SUCESS = "TRADE_SUCCESS";     // 付款成功
+
+        String RESPONSE_SUCCESS = "success";      // 付款成功
+        String RESPONSE_FAILED = "failure";       // 付款失败
     }
 
     /**
@@ -181,5 +196,9 @@ public class Const {
             }
             throw new RuntimeException("没有找到对应的枚举！");
         }
+    }
+
+    public interface REDIS_LOCK {
+        String CLOSE_ORDER_TASK_LOCK = "CLOSE_ORDER_TASK_LOCK"; // 关闭订单的分布式锁
     }
 }

@@ -29,6 +29,7 @@ import com.xmall.vo.OrderVo;
 import com.xmall.vo.ShippingVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,7 +497,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-
     // 支付模块
 
     /**
@@ -653,32 +653,32 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 支付宝回调方法被回调后，更新订单状态，库存等
-     * @param params
+     * 扫码支付后，支付宝回调方法被回调后，对回调进行处理，更新订单状态，库存等
+     * @param params  为支付宝回调时回传的参数
      * @return
      */
     @Override
     public ServerResponse aliCallback(Map<String, String> params) {
-        System.out.println("开始调用服务器层的回调函数！");
-        Long orderNo = Long.parseLong(params.get("out_order_no"));
-        String tradeNo = params.get("trade_no");
-        String tradeStatus = params.get("trade_status");
-        Order order = orderMapper.selectByOrderNo(orderNo);
+        Long orderNo = Long.parseLong(params.get("out_trade_no"));      // 原支付请求的商户订单号
+        String tradeNo = params.get("trade_no");                        // 支付宝交易凭证号
+        String tradeStatus = params.get("trade_status");                // 交易状态
+        Order order = orderMapper.selectByOrderNo(orderNo);             // 根据订单号查询订单信息
         if (order == null) {
-            System.out.println("非本商城的订单，回调忽略");
+            logger.info("非本商城的订单，回调忽略!");
             return ServerResponse.createByErrorMessage("非本商城的订单，回调忽略！");
         }
         if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()) {
-            System.out.println("支付宝重复回调！");
+            logger.info("支付宝重复回调！");
             return ServerResponse.createBySuccess("支付宝重复回调！");
         }
-        if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCESS.equals(tradeStatus)) {
-            order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));    // 支付时间
-            order.setStatus(Const.OrderStatusEnum.PAID.getCode());
-            orderMapper.updateByPrimaryKeySelective(order); // 更新订单状态为已付款
-            System.out.println("更新订单状态了！");
+        if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCESS.equals(tradeStatus)) {       // 买家已付款成功
+            order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));    // 设置支付时间
+            order.setStatus(Const.OrderStatusEnum.PAID.getCode());                      // 设置状态为已支付
+            orderMapper.updateByPrimaryKeySelective(order);                             // 更新订单状态为已付款
+            logger.info("更新订单状态为已支付！");
         }
-        System.out.println("准备封装支付信息！");
+
+        // 记录交易信息，不管是否已付款
         PayInfo payInfo = new PayInfo();
         payInfo.setUserId(order.getUserId());
         payInfo.setOrderNo(order.getOrderNo());
@@ -686,10 +686,10 @@ public class OrderServiceImpl implements IOrderService {
         payInfo.setPlatformNumber(tradeNo);
         payInfo.setPlatformStatus(tradeStatus);
 
-        payInfoMapper.insert(payInfo);
-        System.out.println("插入订单信息成功！");
+        payInfoMapper.insert(payInfo);                                  // 记录交易信息
+        logger.info("记录交易信息，订单号：{}，交易状态：{}",orderNo, tradeStatus);
 
-        return ServerResponse.createBySuccess();
+        return ServerResponse.createBySuccess();                        // 返回交易信息
     }
 
     /**
@@ -708,6 +708,38 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByError();
+    }
+
+    /**
+     * @MethodName: closeOrder
+     * @Description: 用于支持定时任务关闭超时未支付订单
+     * @Param: [hour]
+     * @Return: void
+     * @Author: rwxian
+     * @Date: 2019/8/20 23:43
+     */
+    @Override
+    public void closeOrder(int hour) {
+        Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+        List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(),
+                DateTimeUtil.dateToStr(closeDateTime));     // 查询未支付订单
+        for (Order order : orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());    // 根据订单编号查询购买的商品有哪些
+            for (OrderItem orderItem : orderItemList) {
+
+                // 一定要使用主键作为where条件，形成行级锁，防止锁表。同时是必须支持mysql的InnoDB
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId()); // 根据商品编号查询库存
+                if (stock == null) {    // 考虑到已生成的订单里的商品被删除的情况
+                    continue;
+                }
+                Product product = new Product();
+                product.setId(orderItem.getId());
+                product.setStatus(stock + orderItem.getQuantity());     // 新的库存为：原有的库存+将要关闭的订单中包含的商品的数量
+                productMapper.updateByPrimaryKeySelective(product);     // 更新商品库存
+            }
+            orderMapper.closeOrderByOrderId(order.getId());             // 关闭超时未支付订单
+            logger.info("通过定时任务关闭超时未支付的订单-OrderNo:{}", order.getOrderNo());
+        }
     }
 
 }
